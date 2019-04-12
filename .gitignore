@@ -1,0 +1,8 @@
+*
+!*/
+!*.pdf
+!.gitignore
+!*.ipynb
+!*.txt
+!*.py
+!*.h5
