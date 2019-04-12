@@ -6,4 +6,4 @@
 !*.txt
 !*.py
 !*.h5
-!data/README.txt
+.ipynb_checkpoints
