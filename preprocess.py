@@ -120,7 +120,7 @@ if __name__ == "__main__":
     if verbose:
         print("Saving data ...")
 
-    np.save(f_x_train, X_train)
-    np.save(f_x_test, X_test)
-    np.save(f_y_train, Y_train)
-    np.save(f_y_test, Y_test)
+    np.save(os.path.join(d_data, f_x_train), X_train)
+    np.save(os.path.join(d_data, f_x_test), X_test)
+    np.save(os.path.join(d_data, f_y_train), Y_train)
+    np.save(os.path.join(d_data, f_y_test), Y_test)
