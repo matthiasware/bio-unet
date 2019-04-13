@@ -7,13 +7,13 @@ from preprocess import get_files
 d_data = "data"
 f_train = "train.pkl"
 f_test = "test.pkl"
-test_size = 0.5
+test_size = 0.15
 
 if __name__ == "__main__":
     files = get_files(d_data, verbose=False)
     np.random.shuffle(files)
     np.random.shuffle(files)
-    n_test = int(np.ceil(len(files) * 0.15))
+    n_test = int(np.ceil(len(files) * test_size))
 
     files_test = files[: n_test]
     files_train = files[n_test:]
