@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.preprocessing.image import load_img, array_to_img
 from sklearn.model_selection import train_test_split
+import itertools
 
 d_data = "data"
 f_x_train = "x_train"
@@ -12,6 +13,53 @@ f_y_train = "y_train"
 f_y_test = "y_test"
 test_size = 0.1
 verbose = True
+
+
+def get_ndarray_from_csv(path, width, height):
+    with open(path, "r") as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',', quotechar='|')
+        img = np.zeros((width, height, 1))
+        for row in csv_reader:
+            xx = np.array(row[0::2], dtype=np.int)
+            yy = np.array(row[1::2], dtype=np.int)
+            img[yy, xx] = 1
+    return img
+
+
+def augment_imgarr(x, i):
+    if i % 4 == 0:
+        return np.rot90(x, k=i)
+    if i == 4:
+        return np.flip(x, 0)
+    if i == 5:
+        return np.flip(x, 1)
+    else:
+        return np.transpose(x, axes=(1, 0, 2))
+
+
+def calc_weights(y):
+    n_ones = np.sum(y)
+    n_total = y.shape[1]**2
+    w_ones = 1 - n_ones / n_total
+    w_zeros = 1 - w_ones
+    w = y * (w_ones - w_zeros) + w_zeros
+    return w
+
+
+def dataGenerator(files, batches=1):
+    files = itertools.cycle(files)
+    while True:
+        X = np.zeros((batches, 2084, 2084, 3), dtype=np.float32)
+        Y = np.zeros((batches, 2084, 2084, 1), dtype=np.float32)
+        for i in range(batches):
+            f_png, f_csv, _ = next(files)
+            x = np.array(load_img(f_png))
+            y = get_ndarray_from_csv(f_csv, X[i].shape[0], X[i].shape[1])
+            x = x / 255
+            idx = np.random.randint(0, 7)
+            X[i] = augment_imgarr(x, idx)
+            Y[i] = augment_imgarr(y, idx)
+        yield X, Y
 
 
 def plot_triple(f_csv, f_png, f_jpg):
@@ -55,17 +103,6 @@ def get_files(path, verbose=True):
                     print(f_png, "\n", f_csv, "\n", f_jpg)
                 data.append((f_png, f_csv, f_jpg))
     return data
-
-
-def get_ndarray_from_csv(path, width, height):
-    with open(path, "r") as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',', quotechar='|')
-        img = np.zeros((width, height, 1))
-        for row in csv_reader:
-            xx = np.array(row[0::2], dtype=np.int)
-            yy = np.array(row[1::2], dtype=np.int)
-            img[yy, xx] = 1
-    return img
 
 
 def load_data(files, verbose=True):

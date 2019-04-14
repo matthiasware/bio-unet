@@ -1,0 +1,225 @@
+Task
+Mitotic count: Number of cells undergoing mitosis
+Important parameter for breast cancer detection
+Want to detect cells that undergo mitosis
+
+Count = (P + M + A + T) / N 
+
+
+Data:
+	HE Gefärbte Gewebeschnitte in Form von 2084 x 2084 Bilddaten
+Task:
+	Pixel-level classification!
+
+Questions to prepare
+====================
+1) What are the advantages and shortcomings of this approach?
+	Advantages:
+	- Trainable on small dataset
+	- U-Architecture reduces parameter count
+	- Trained end-to-end
+	Shortcommings:
+	- memory consuming!
+2) Would there be feasible alternatives?
+	- Preserving Image size
+3) How would you further improve the method?
+
+
+
+What I Did Not DO:
+- Transposed Convolution
+- Image reflection for tiling
+- ...
+- Does Data augmentation help ?
+
+
+Alternatives:
+- classify image as a whole
+- old school approaches
+- divide image into patches and classify them
+
+
+TODO
+- Train on 
+
+
+data augmentation to deal with less data -> data generator
+overlap-tile strategy = mirroing to get predictions for the whole regions
+
+tqdm skimage
+
+
+architecture:
+contraction path:
+	repeat:
+		2 @ 3x3 convolution, unpadded
+		relu
+		2x2 max-pooling, stride 2
+
+	double number of feature channels in each step
+
+expansion path:
+	repeat:
+		upsampling
+		2x2 convolution, halves number of feature channels
+		concatenation with corresponding cropped features map
+		3x3 convolution
+		relu
+		3x4 convolution
+		relu
+
+	last
+		1x1 convolution
+
+TODO Freitag:
+	- data preprocessing fertig machen
+	- upsampling
+	- weight map fertig machen, aber noch nicht nutzen
+	- modell implementieren, laufen lassen
+	- start jupyter server @ raj
+TODO SamSTAG:
+	- checken ob weight map wichtig ist
+	- alles durchrechnen
+TODO Sonntag:
+	- modelle rechnen
+	- vorbereitung
+
+TODO
+- convolution mathematisch beschreiben können
+- transposed convolution mathematisch beschreiben können
+- alle operatoren mathematisch beschrieben können
+- data generator for augmentation
+- read both papers, learn to descibe architecture
+- how many validation
+- extra test data?
+- how to split data?
+- https://machinelearningmastery.com/difference-test-validation-datasets/
+- own non generic implementation
+- how backproagaion works,
+- how stochastic gradient descent works
+- how does adam work
+- how many batches ?
+- how many epochs?
+	-> until no improvement on validation set is reached
+	- Too much training: overfit
+	- Not enough training: underfit
+	-> stop when performance on validatoin set degrades: early-stopping
+- learning rate?
+- rename code!!!
+- change kernel size
+- add transposed convolution
+- stochastic gradient descent, with momentum
+- what is 1x1 convolution?
+- regularizations:
+	- drop out
+
+
+
+
+Training Dataset: The sample of data used to fit the model. (weights and biases)
+Validation Dataset: The sample of data used to provide an unbiased evaluation of a model fit on the training dataset while tuning model hyperparameters. The evaluation becomes more biased as skill on the validation dataset is incorporated into the model configuration.
+Test Dataset: The sample of data used to provide an unbiased evaluation of a final model fit on the training dataset.
+				How well does it generalize?
+
+
+data  = train + d_test
+train = train + validation
+
+train, validation, test = split(data)
+ 
+# tune model hyperparameters
+parameters = ...
+for params in parameters:
+	model = fit(train, params)
+	skill = evaluate(model, validation)
+ 
+# evaluate final model for comparison with other models
+model = fit(train)
+skill = evaluate(model, test)
+
+10-fold cross validation:
+
+# split data
+data = ...
+train, test = split(data)
+ 
+# tune model hyperparameters
+parameters = ...
+k = ...
+for params in parameters:
+	skills = list()
+	for i in k:
+		fold_train, fold_val = cv_split(i, k, train)
+		model = fit(fold_train, params)
+		skill_estimate = evaluate(model, fold_val)
+		skills.append(skill_estimate)
+	skill = summarize(skills)
+ 
+# evaluate final model for comparison with other models
+model = fit(train)
+skill = evaluate(model, test)
+
+
+https://www.jeremyjordan.me/semantic-segmentation/
+https://keras.rstudio.com/articles/examples/unet.html
+https://keras.io/layers/convolutional/
+https://keras.io/layers/convolutional/
+Implementation working:https://www.kaggle.com/cjansen/u-net-in-keras/code
+Understanding: https://towardsdatascience.com/understanding-semantic-segmentation-with-unet-6be4f42d4b47
+Unet: https://towardsdatascience.com/review-u-net-biomedical-image-segmentation-d02bf06ca760
+Unet: https://medium.com/coinmonks/learn-how-to-train-u-net-on-your-dataset-8e3f89fbd623
+Implementation: https://github.com/zizhaozhang/unet-tensorflow-keras/blob/master/model.py
+https://github.com/zhixuhao/unet/blob/master/model.py
+https://www.kaggle.com/cjansen/u-net-in-keras/code
+https://medium.com/data-science-bootcamp/understand-the-softmax-function-in-minutes-f3a59641e86d
+https://www.quora.com/What-is-a-1X1-convolution
+http://ruder.io/optimizing-gradient-descent/
+
+#################################################
+Unet - Paper
+#################################################
+- Upsampling
+- Cropping
+- Data augmentation
+
+
+architecture:
+contraction path:
+	repeat:
+		2 @ 3x3 convolution, unpadded
+		relu
+		2x2 max-pooling, stride 2
+
+	double number of feature channels in each step
+
+expansion path:
+	repeat:
+		upsampling
+		2x2 convolution, halves number of feature channels
+		concatenation with corresponding cropped features map
+		3x3 convolution
+		relu
+		3x4 convolution
+		relu
+
+	last
+		1x1 convolution
+
+
+
+Improve:
+- Cropping -> tiling image
+	Loss:
+	- sigmoid vs softmax
+	Augementation:
+	- GANS for preprocessing
+	- Biomedical Data Augmentation Using Generative Adversarial Neural Networks
+
+Drawback:
+
+
+
+Image generator: https://github.com/divamgupta/image-segmentation-keras/blob/master/LoadBatches.py
+
+
+TENSORBOARD !!!
