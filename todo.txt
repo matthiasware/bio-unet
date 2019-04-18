@@ -1,18 +1,3 @@
-TODO
-- reread paper
-- summarize math on paper
-- overfit vs underfit
-- how backpropagation works
-- architecture map
-- LOSS: make individual weights
-- TRAIN ON DLR
-- convolution mathematisch beschreiben können
-- transposed convolution mathematisch beschreiben können
-- reorganize repository
-- Train:
-	- Transposed convolution: DLR
-	- Resnet as backbone: RAJ
-
 Task
 Mitotic count: Number of cells undergoing mitosis
 Important parameter for breast cancer detection
@@ -42,16 +27,16 @@ Questions to prepare
 
 
 What I Did Not DO:
-- Transposed Convolution
-- Image reflection for tiling
 - overlap-tile strategy = mirroing to get predictions for the whole regions
-- Does Data augmentation help ?
+- Does Data augmentation help
 - elastic deformations for augmentation
 - 10-fold cross validation
 - Hyperparameter tuning
 - try existing Backbones
 
 Problems:
+- Hardware
+- Loss function not good enough
 - tensorboard
 - concatenate changes model shapes !?!
 

@@ -2,8 +2,12 @@ import keras.backend as K
 
 
 def weighted_binary_crossentropy(y_true, y_pred):
-    weights_one = 0.9991
-    weights_zero = 0.0009
+    # weights_one = 0.9991
+    # weights_one = 0.99991
+    weights_one = 0.9971
+    # weights_zero = 0.0009
+    # weights_zero = 0.00009
+    weights_zero = 0.0029
 
     bce = K.binary_crossentropy(y_true, y_pred)
 
@@ -45,14 +49,28 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
     return (1 - jac) * smooth
 
 
+def combined_loss(y_true, y_pred):
+    return 0.5 * jaccard_distance_loss(y_true, y_pred) + 0.5 * weighted_binary_crossentropy(y_true, y_pred)
+
+# def dice_coef(y_true, y_pred, smooth=1):
+#     """
+#     Dice = (2*|X & Y|)/ (|X|+ |Y|)
+#          =  2*sum(|A*B|)/(sum(A^2)+sum(B^2))
+#     ref: https://arxiv.org/pdf/1606.04797v1.pdf
+#     """
+#     intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+#     return (2. * intersection + smooth) / (K.sum(K.square(y_true),-1) + K.sum(K.square(y_pred),-1) + smooth)
+
+# def dice_coef_loss(y_true, y_pred):
+#     return 1-dice_coef(y_true, y_pred)
+
+
 def dice_coef(y_true, y_pred, smooth=1):
-    """
-    Dice = (2*|X & Y|)/ (|X|+ |Y|)
-         =  2*sum(|A*B|)/(sum(A^2)+sum(B^2))
-    ref: https://arxiv.org/pdf/1606.04797v1.pdf
-    """
-    intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
-    return (2. * intersection + smooth) / (K.sum(K.square(y_true),-1) + K.sum(K.square(y_pred),-1) + smooth)
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
 
 def dice_coef_loss(y_true, y_pred):
-    return 1-dice_coef(y_true, y_pred)
+    return -dice_coef(y_true, y_pred)
