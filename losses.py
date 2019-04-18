@@ -2,30 +2,20 @@ import keras.backend as K
 
 
 def weighted_binary_crossentropy(y_true, y_pred):
-    # weights_one = 0.9991
-    # weights_one = 0.99991
-    weights_one = 0.9971
-    # weights_zero = 0.0009
-    # weights_zero = 0.00009
-    weights_zero = 0.0029
-
     bce = K.binary_crossentropy(y_true, y_pred)
-
-    weight_vector = y_true * weights_one + (1. - y_true) * weights_zero
+    weight_vector = y_true * 0.9971 + (1. - y_true) * 0.0029
     ce_weighted = weight_vector * bce
-
     return K.mean(ce_weighted)
 
 
 def make_bce_loss(weights_one, weights_zero):
+
     def inner_weighted_binary_crossentropy(y_true, y_pred):
-
         bce = K.binary_crossentropy(y_true, y_pred)
-
         weight_vector = y_true * weights_one + (1. - y_true) * weights_zero
         ce_weighted = weight_vector * bce
-
         return K.mean(ce_weighted)
+
     return inner_weighted_binary_crossentropy
 
 
@@ -35,8 +25,8 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
             = sum(|A*B|)/(sum(|A|)+sum(|B|)-sum(|A*B|))
 
     The jaccard distance loss is usefull for unbalanced datasets. This has been
-    shifted so it converges on 0 and is smoothed to avoid exploding or disapearing
-    gradient.
+    shifted so it converges on 0 and is smoothed to avoid exploding
+    or disapearing gradient.
 
     Ref: https://en.wikipedia.org/wiki/Jaccard_index
 
@@ -50,26 +40,18 @@ def jaccard_distance_loss(y_true, y_pred, smooth=100):
 
 
 def combined_loss(y_true, y_pred):
-    return 0.5 * jaccard_distance_loss(y_true, y_pred) + 0.5 * weighted_binary_crossentropy(y_true, y_pred)
-
-# def dice_coef(y_true, y_pred, smooth=1):
-#     """
-#     Dice = (2*|X & Y|)/ (|X|+ |Y|)
-#          =  2*sum(|A*B|)/(sum(A^2)+sum(B^2))
-#     ref: https://arxiv.org/pdf/1606.04797v1.pdf
-#     """
-#     intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
-#     return (2. * intersection + smooth) / (K.sum(K.square(y_true),-1) + K.sum(K.square(y_pred),-1) + smooth)
-
-# def dice_coef_loss(y_true, y_pred):
-#     return 1-dice_coef(y_true, y_pred)
+    jdl = jaccard_distance_loss(y_true, y_pred)
+    wbc = weighted_binary_crossentropy(y_true, y_pred)
+    return 0.1 * jdl + 0.9 * wbc
 
 
 def dice_coef(y_true, y_pred, smooth=1):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    nom = (2. * intersection + smooth)
+    den = (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    return nom / den
 
 
 def dice_coef_loss(y_true, y_pred):

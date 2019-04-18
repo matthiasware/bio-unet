@@ -4,7 +4,6 @@ files = preprocess.get_files("data", verbose=False)
 X, Y = preprocess.load_imgs(files[0:1])
 X = X[0]
 Y = Y[0]
-preprocess.show_img(X, Y)
 print(X.shape, Y.shape)
 
 idcs = preprocess.square_img_split_idcs(2084, 512)
