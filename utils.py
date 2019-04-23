@@ -15,6 +15,9 @@ def show_img(img1, img2=None):
         ax.imshow(img1)
     else:
         ax[0].imshow(img1)
+        print(img2.shape)
+        if len(img2.shape) == 3:
+            img2 = img2.reshape(img2.shape[:-1])
         ax[1].imshow(img2)
     plt.show()
 
@@ -117,6 +120,34 @@ def get_square_img_split_idcs(img_size, partition_size):
 
     assert len(idcs) == partitions**2
     return idcs
+
+
+def split_img(X, Y, split_idcs):
+    X_assembled = (np.random.random(X.shape) * 255).astype(X.dtype)
+    Y_assembled = (np.random.random(Y.shape) * 255).astype(Y.dtype)
+
+    X_part = X[split_idcs[0]]
+    Y_part = Y[split_idcs[0]]
+
+    X_new = np.zeros((len(split_idcs), *X_part.shape)).astype(X.dtype)
+    Y_new = np.zeros((len(split_idcs), *Y_part.shape)).astype(Y.dtype)
+
+    for i, idx in enumerate(split_idcs):
+        X_new[i] = X[idx]
+        Y_new[i] = Y[idx]
+        X_assembled[idx] = X_new[i]
+        Y_assembled[idx] = Y_new[i]
+
+    assert np.sum(X - X_assembled) == 0, "X does not match assembled version!"
+    assert np.sum(Y - Y_assembled) == 0, "Y does not match assembled version!"
+
+    return X_new, Y_new
+
+
+def store_img(X, path):
+    imageio.imwrite(path, X)
+    X_read = imageio.imread(path)
+    assert np.sum(X_read - X) == 0, "X does not match written version!"
 
 
 def split_and_store_img(X, Y, split_idcs, path, file_form):
