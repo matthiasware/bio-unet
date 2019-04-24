@@ -5,5 +5,4 @@
 !*.ipynb
 !*.txt
 !*.py
-!*.h5
 .ipynb_checkpoints

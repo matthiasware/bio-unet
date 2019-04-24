@@ -15,7 +15,6 @@ def show_img(img1, img2=None):
         ax.imshow(img1)
     else:
         ax[0].imshow(img1)
-        print(img2.shape)
         if len(img2.shape) == 3:
             img2 = img2.reshape(img2.shape[:-1])
         ax[1].imshow(img2)
