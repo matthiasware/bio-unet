@@ -5,6 +5,9 @@ TODO
 - metrics on test set
 - automate loading of models
 - use second order information
+- KERAS BOOK
+- read whole documentation
+- verify ACC_zeros vs tp, tn ect.
 
 
 Task

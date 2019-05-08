@@ -7,6 +7,16 @@ import itertools
 import imageio
 
 
+def plot(train, valid, metrics_name):
+    epoch_count = range(1, len(train) + 1)
+    plt.plot(epoch_count, train, "r--")
+    plt.plot(epoch_count, valid, "b-")
+    plt.legend(["Training " + metrics_name, "Validation " + metrics_name])
+    plt.xlabel('Epoch')
+    plt.ylabel(metrics_name)
+    plt.show()
+
+
 def show_img(img1, img2=None):
     nrows = 1
     ncols = 1 if img2 is None else 2
